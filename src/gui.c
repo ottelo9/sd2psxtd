@@ -28,6 +28,7 @@
 #include "ps1/ps1_cardman.h"
 #include "ps1/ps1_mc_data_interface.h"
 #include "ps2/ps2_cardman.h"
+#include "sd.h"
 #include "splash.h"
 #include "settings.h"
 #include "ui_menu.h"
@@ -50,7 +51,6 @@ static lv_style_t style_inv, src_main_label_style;
 static lv_anim_t src_main_animation_template;
 static lv_obj_t *scr_main_idx_lbl, *scr_main_channel_lbl, *src_main_title_lbl, *lbl_channel, *lbl_ps1_autoboot, *lbl_ps1_game_id, *lbl_ps2_autoboot,
     *lbl_ps2_cardsize, *lbl_ps2_variant, *lbl_ps2_game_id, *lbl_civ_err, *auto_off_lbl, *contrast_lbl, *vcomh_lbl, *lbl_mode, *lbl_scrn_flip;
-
 
 static struct {
     uint8_t value;
@@ -962,6 +962,9 @@ static void create_menu_screen(void) {
     lv_obj_t *info_page = ui_menu_subpage_create(menu, NULL);
     ui_header_create(info_page, "Info", false);
     {
+        sd_cid_t cid = sd_get_CID();
+        char text[32];
+
         cont = ui_menu_cont_create_nav(info_page);
         ui_label_create_grow_scroll(cont, "Version");
         ui_label_create(cont, sd2psx_version);
@@ -977,6 +980,23 @@ static void create_menu_screen(void) {
 #else
         ui_label_create(cont, "No");
 #endif
+        snprintf(text, sizeof(text), "%04X", cid.mid);
+        cont = ui_menu_cont_create_nav(info_page);
+        ui_label_create_grow_scroll(cont, "SD MID");
+        ui_label_create(cont, text);
+        memset(text, 0, sizeof(text));
+
+        snprintf(text, sizeof(text), "%02X%02X", cid.oid[0], cid.oid[1]);
+        cont = ui_menu_cont_create_nav(info_page);
+        ui_label_create_grow_scroll(cont, "SD OID");
+        ui_label_create(cont, text);
+        memset(text, 0, sizeof(text));
+
+        snprintf(text, sizeof(text), "%02d/%04d",
+            cid.mdt_month, 2000 + ((cid.mdt_year_high << 4) | cid.mdt_year_low));
+        cont = ui_menu_cont_create_nav(info_page);
+        ui_label_create_grow_scroll(cont, "SD Date");
+        ui_label_create(cont, text);
     }
 
     /* Main menu */

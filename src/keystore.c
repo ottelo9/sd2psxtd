@@ -78,8 +78,6 @@ int __not_in_flash_func(keystore_deploy)(void) {
     uint8_t chkbuf[256] = { 0 };
     const char* path;
 
-    sd_init();
-
     if (sd_exists(civ_path))
         path = civ_path;
     else if (sd_exists(civ_path_backup))

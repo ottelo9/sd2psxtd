@@ -287,3 +287,23 @@ extern "C" int sd_seek64(int fd, int64_t offset, int whence) {
     }
     return 1;
 }
+
+extern "C" sd_cid_t sd_get_CID(void) {
+    cid_t cid;
+    sd_cid_t out_cid;
+
+    if (sd.card()->readCID(&cid)) {
+        out_cid.psn = cid.psn;
+        out_cid.mid = cid.mid;
+        memcpy(out_cid.oid, cid.oid, 2);
+        memcpy(out_cid.pnm, cid.pnm, 5);
+        out_cid.prv = (cid.prv_n << 4) | cid.prv_m;
+        out_cid.mdt_month = cid.mdt_month;
+        out_cid.mdt_year_high = cid.mdt_year_high;
+        out_cid.mdt_year_low = cid.mdt_year_low;
+        out_cid.always1 = cid.always1;
+    } else {
+        memset(&out_cid, 0, sizeof(sd_cid_t));
+    }
+    return out_cid;
+}

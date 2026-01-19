@@ -173,7 +173,6 @@ static void genblock(size_t pos, void *buf) {
 
 void ps1_cardman_open(void) {
     char path[96];
-    sd_init();
     ensuredirs();
     needs_update = false;
 

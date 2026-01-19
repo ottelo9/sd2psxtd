@@ -220,7 +220,6 @@ static void settings_reset(void) {
 }
 
 void settings_load_sd(void) {
-    sd_init();
     if (sd_exists(settings_path)) {
         settings_deserialize();
     } else {

@@ -512,7 +512,6 @@ void ps2_cardman_open(void) {
 
     needs_update = false;
 
-    sd_init();
     ensuredirs();
 
     switch (cardman_state) {

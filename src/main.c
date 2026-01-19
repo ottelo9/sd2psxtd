@@ -177,6 +177,8 @@ int main() {
     led_init();
 #endif
 
+    sd_init();
+
     while (1) {
         if (settings_get_mode(true) == MODE_PS2) {
             printf("Starting PS2 mode...\n");
