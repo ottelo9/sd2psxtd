@@ -38,7 +38,7 @@ extern "C" void sd_init() {
 
 
         int ret = sd.begin(SdSpiConfig(SD_CS, DEDICATED_SPI, SD_BAUD, &SD_PERIPH));
-
+/*
         cid_t cid;
         if (sd.card()->readCID(&cid)) {
             DPRINTF("SD Card CID:\n");
@@ -51,15 +51,27 @@ extern "C" void sd_init() {
                 cid.mdt_month, 2000 + ((cid.mdt_year_high << 4) | cid.mdt_year_low));
         } else {
             DPRINTF("failed to read CID\n");
-        }
+        }*/
         if (ret != 1) {
+            char text[128];
+            cid_t cid;
+            memset(&cid, 0, sizeof(cid));
+            sd.card()->readCID(&cid);
+            snprintf(text, sizeof(text),
+                "MID: 0x%02X    OEM-ID: %.2s\nPID: %.5s    R: %d.%d\nSN: 0x%08X  Date: %02d/%04d",
+                cid.mid,
+                cid.oid,
+                cid.pnm,
+                cid.prv_n, cid.prv_m,
+                cid.psn,
+                cid.mdt_month, 2000 + ((cid.mdt_year_high << 4) | cid.mdt_year_low));
 
             if (sd.sdErrorCode()) {
-                fatal(ERR_SDCARD, "failed to mount the card\nSdError: 0x%02X,0x%02X\ncheck the card", sd.sdErrorCode(), sd.sdErrorData());
+                fatal(ERR_SDCARD, "failed to mount the card\nSdError: 0x%02X,0x%02X\ncheck the card\n%s", sd.sdErrorCode(), sd.sdErrorData(), text);
             } else if (!sd.fatType()) {
                 fatal(ERR_SDCARD, "failed to mount the card\ncheck the card is formatted correctly");
             } else {
-                fatal(ERR_SDCARD, "failed to mount the card\nUNKNOWN");
+                fatal(ERR_SDCARD, "failed to mount the card\nUNKNOWN\n%s", text);
             }
         }
         initialized = true;
