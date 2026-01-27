@@ -347,22 +347,27 @@ static void evt_scr_main(lv_event_t *event) {
             ui_state = UI_STATE_MENU;
         }
         if (key == INPUT_KEY_PREV || key == INPUT_KEY_NEXT || key == INPUT_KEY_BACK || key == INPUT_KEY_ENTER) {
-            if (settings_get_mode(true) == MODE_PS1) {
-                switch (key) {
-                    case INPUT_KEY_PREV: ps1_mmce_prev_ch(true); break;
-                    case INPUT_KEY_NEXT: ps1_mmce_next_ch(true); break;
-                    case INPUT_KEY_BACK: ps1_mmce_prev_idx(true); break;
-                    case INPUT_KEY_ENTER: ps1_mmce_next_idx(true); break;
-                }
+            if (ui_state == UI_STATE_GAME_IMG) {
+                ui_state = UI_STATE_MAIN;
             } else {
-                switch (key) {
-                    case INPUT_KEY_PREV: ps2_mmceman_prev_ch(true); break;
-                    case INPUT_KEY_NEXT: ps2_mmceman_next_ch(true); break;
-                    case INPUT_KEY_BACK: ps2_mmceman_prev_idx(true); break;
-                    case INPUT_KEY_ENTER: ps2_mmceman_next_idx(true); break;
+                if (settings_get_mode(true) == MODE_PS1) {
+                    switch (key) {
+                        case INPUT_KEY_PREV: ps1_mmce_prev_ch(true); break;
+                        case INPUT_KEY_NEXT: ps1_mmce_next_ch(true); break;
+                        case INPUT_KEY_BACK: ps1_mmce_prev_idx(true); break;
+                        case INPUT_KEY_ENTER: ps1_mmce_next_idx(true); break;
+                    }
+                } else {
+                    switch (key) {
+                        case INPUT_KEY_PREV: ps2_mmceman_prev_ch(true); break;
+                        case INPUT_KEY_NEXT: ps2_mmceman_next_ch(true); break;
+                        case INPUT_KEY_BACK: ps2_mmceman_prev_idx(true); break;
+                        case INPUT_KEY_ENTER: ps2_mmceman_next_idx(true); break;
+                    }
                 }
+                ui_state = UI_STATE_MAIN;
             }
-            ui_state = UI_STATE_MAIN;
+
         }
         time_screen = time_us_64();
     }
