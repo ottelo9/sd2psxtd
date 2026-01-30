@@ -1,21 +1,6 @@
-name: Build Manually
+name: Build Nightly
 
-on:
-  # Manual trigger (button in GitHub Actions UI)
-  workflow_dispatch:
-    inputs:
-      release_tag:
-        description: 'Release'
-        required: true
-        default: 'psxmemcard'
-      prerelease:
-        description: 'Create as prerelease?'
-        required: true
-        default: 'false'
-        type: choice
-        options:
-          - 'false'
-          - 'true'
+on: workflow_dispatch
 #  push:
 #    tags:
 #      - '*'
@@ -35,10 +20,10 @@ jobs:
     #needs: create_release
     strategy:
       matrix:
-        # For manual runs, build ONLY PSXMemCard (release image). For push/tag runs, build all variants.
-        target: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '["PSXMemCard"]' || '["SD2PSX","SD2PSXlite","PMC+","PMCZero","PSXMemCard"]') }}
-        # For manual runs, build ONLY non-debug image. For push/tag runs, build both.
-        debug: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '["OFF"]' || '["ON","OFF"]') }}
+        #target: [SD2PSX, SD2PSXlite, PMC+, PMCZero, PSXMemCard]
+        target: [PSXMemCard]
+        #debug: [ON, OFF]
+        debug: [OFF]
         include:
           - debug: ON
             ext: -debug.uf2
@@ -65,17 +50,9 @@ jobs:
     - run: |
         git submodule update --init --recursive --filter=blob:none
         git fetch origin --tags --force
-        TAG=$(git describe --tags --exact-match HEAD --exclude=latest --exclude=nightly) || true
-        if [ $TAG ]
-        then
-          echo "SD2PSX_VERSION=${TAG}" >> $GITHUB_ENV
-          echo "SD2PSX_RLS_TAG=latest" >> $GITHUB_ENV
-          echo "${TAG}"
-        else
-          echo "SD2PSX_VERSION=nightly-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "SD2PSX_RLS_TAG=nightly" >> $GITHUB_ENV
-          echo "nightly"
-        fi
+        echo "SD2PSX_VERSION=build-$(date +'%Y-%m-%d_%H-%M')" >> $GITHUB_ENV
+        echo "SD2PSX_RLS_TAG=build" >> $GITHUB_ENV
+        echo "build"
 
     - name: add build essential
       run: sudo apt-get update && sudo apt-get install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib clangd git python3-venv
@@ -94,44 +71,31 @@ jobs:
         path: build/${{ matrix.filename }}${{ matrix.ext }}
 
   create_release:
-    # - Manual run: always create/update a GitHub Release for PSXMemCard (tag from input)
-    # - Push/tag runs: keep existing behavior (tags, develop, main)
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    #if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch'
     needs: [build]
     runs-on: ubuntu-latest
     steps:
     - name: Download all artifacts
       uses: actions/download-artifact@v4
 
-    # Manual: create a proper (non-nightly) release for PSXMemCard
-    - name: Create release (manual)
-      if: github.event_name == 'workflow_dispatch'
-      uses: mathieucarbou/marvinpinto-action-automatic-releases@latest
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: "${{ github.event.inputs.prerelease }}"
-        automatic_release_tag: "${{ github.event.inputs.release_tag }}"
-        title: "PSXMemCard ${{ env.SD2PSX_VERSION }}"
-        files: |
-          */*.uf2
-
-    - name: Create Nightly
-      if: github.event_name != 'workflow_dispatch' && (!startsWith(github.ref, 'refs/tags/'))
+    - name: Create Release
+      if: true
       uses: mathieucarbou/marvinpinto-action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: true
-        automatic_release_tag: "nightly"
+        automatic_release_tag: "manbuild"
         title: "${{ env.SD2PSX_VERSION }}"
         files: |
           */*.uf2
 
-    - name: Create release
-      if: github.event_name != 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/')
-      uses: mathieucarbou/marvinpinto-action-automatic-releases@latest
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: "${{ contains(github.ref, '-rc') || contains(github.ref, '-beta')}}"
-        title: "${{ env.SD2PSX_VERSION }}"
-        files: |
-          */*.uf2
+#    - name: Create release
+#      if: startsWith(github.ref, 'refs/tags/')
+#      uses: mathieucarbou/marvinpinto-action-automatic-releases@latest
+#      with:
+#        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+#        prerelease: "${{ contains(github.ref, '-rc') || contains(github.ref, '-beta')}}"
+#        title: "${{ env.SD2PSX_VERSION }}"
+#        files: |
+#          */*.uf2
