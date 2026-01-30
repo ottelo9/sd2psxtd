@@ -1,4 +1,4 @@
-name: Build Nightly
+name: Build Manually
 
 on:
   # Manual trigger (button in GitHub Actions UI)
