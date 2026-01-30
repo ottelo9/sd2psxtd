@@ -327,8 +327,11 @@ void ps1_cardman_next_idx(void) {
         case PS1_CM_STATE_NORMAL:
             card_idx += 1;
             card_chan = CHAN_MIN;
-            if (card_idx > UINT16_MAX)
-                card_idx = UINT16_MAX;
+            uint8_t maxcards = settings_get_ps1_maxcards();
+            if (maxcards < IDX_MIN)
+                maxcards = IDX_MIN;
+            if (card_idx > maxcards)
+                card_idx = maxcards;
             snprintf(folder_name, sizeof(folder_name), "Card%d", card_idx);
             break;
     }
