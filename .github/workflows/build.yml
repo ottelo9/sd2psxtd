@@ -25,20 +25,9 @@ jobs:
         #debug: [ON, OFF]
         debug: [OFF]
         include:
-          - debug: ON
-            ext: -debug.uf2
-            delay: 3
           - debug: OFF
             ext: .uf2
             delay: 0
-          - target: SD2PSX
-            filename: sd2psx
-          - target: SD2PSXlite
-            filename: sd2psxlite
-          - target: PMC+
-            filename: pmc+
-          - target: PMCZero
-            filename: pmczero
           - target: PSXMemCard
             filename: psxmemcard
     steps:
