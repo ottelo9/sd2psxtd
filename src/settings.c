@@ -53,7 +53,7 @@ typedef struct {
 #define SETTINGS_SYS_FLAGS_PS2_MODE         (0b0000001)
 #define SETTINGS_SYS_FLAGS_FLIPPED_DISPLAY  (0b0000010)
 
-_Static_assert(sizeof(settings_t) == 20, "unexpected padding in the settings structure");
+_Static_assert(sizeof(settings_t) == 24, "unexpected padding in the settings structure");
 
 static settings_t settings;
 static serialized_settings_t serialized_settings;
