@@ -232,7 +232,7 @@ static void settings_reset(void) {
     settings.ps2_flags = SETTINGS_PS2_FLAGS_GAME_ID;
     settings.ps2_cardsize = 8;
     settings.ps2_variant = PS2_VARIANT_RETAIL;
-    settings.ps1_maxcards = 255;
+    settings.ps1_maxcards = UINT8_MAX;
     if (wear_leveling_write(0, &settings, sizeof(settings)) == WEAR_LEVELING_FAILED)
         fatal(ERR_SETTINGS, "failed to reset settings");
 }
@@ -430,6 +430,16 @@ bool settings_get_ps1_game_id(void) {
 void settings_set_ps1_game_id(bool enabled) {
     if (enabled != settings_get_ps1_game_id())
         settings.ps1_flags ^= SETTINGS_PS1_FLAGS_GAME_ID;
+    SETTINGS_UPDATE_FIELD(ps1_flags);
+}
+
+bool settings_get_ps1_controllercombo(void) {
+    return (settings.ps1_flags & SETTINGS_PS1_FLAGS_CTRL_COMBO);
+}
+
+void settings_set_ps1_controllercombo(bool controllercombo) {
+    if (controllercombo != settings_get_ps1_controllercombo())
+        settings.ps1_flags ^= SETTINGS_PS1_FLAGS_CTRL_COMBO;
     SETTINGS_UPDATE_FIELD(ps1_flags);
 }
 

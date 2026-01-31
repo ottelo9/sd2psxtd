@@ -353,6 +353,10 @@ static void mc_read_controller(void) {
     static uint8_t prevCommand = 0;
     uint8_t controller_in[2];
     uint8_t _ = 0x00;
+
+    if (!settings_get_ps1_controllercombo())
+        return;
+
     receiveOrNextCmd(&_);
     if (_ == (uint8_t)'B') {    // Only reactive to "read buttons" command
         receiveOrNextCntrl(&_); // Hi-Z
