@@ -352,6 +352,8 @@ void settings_set_ps1_maxcards(uint8_t x) {
 int settings_get_ps1_card(void) {
     if (settings.ps1_card < IDX_MIN)
         return IDX_MIN;
+    else if (settings.ps1_card > settings.ps1_maxcards)
+        return settings.ps1_maxcards;
     return settings.ps1_card;
 }
 

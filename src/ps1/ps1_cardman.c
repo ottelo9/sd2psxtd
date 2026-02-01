@@ -59,6 +59,9 @@ static void set_default_card() {
     card_chan = settings_get_ps1_channel();
     cardman_state = PS1_CM_STATE_NORMAL;
     snprintf(folder_name, sizeof(folder_name), "Card%d", card_idx);
+    uint8_t max_chan = card_config_get_max_channels(folder_name, folder_name);
+    if (card_chan > max_chan)
+        card_chan = max_chan;
 }
 
 static bool try_set_game_id_card() {
@@ -288,7 +291,7 @@ void ps1_cardman_next_channel(void) {
         case PS1_CM_STATE_NORMAL:
             card_chan += 1;
             if (card_chan > max_chan)
-                card_chan = CHAN_MIN;
+                card_chan = max_chan; //dont jump to CHAN_MIN. Otherwise without display, you cant see where you actually are.
             break;
     }
 
@@ -305,7 +308,7 @@ void ps1_cardman_prev_channel(void) {
         case PS1_CM_STATE_NORMAL:
             card_chan -= 1;
             if (card_chan < CHAN_MIN)
-                card_chan = max_chan;
+                card_chan = CHAN_MIN; //dont jump to max_chan. Otherwise without display, you cant see where you actually are.
             break;
     }
     needs_update = true;
@@ -330,7 +333,7 @@ void ps1_cardman_next_idx(void) {
             uint8_t maxcards = settings_get_ps1_maxcards();
             if (maxcards < IDX_MIN)
                 maxcards = IDX_MIN;
-            if (card_idx > maxcards)
+            if (card_idx > maxcards) //dont jump to IDX_MIN. Otherwise without display, you cant see where you actually are.
                 card_idx = maxcards;
             snprintf(folder_name, sizeof(folder_name), "Card%d", card_idx);
             break;
