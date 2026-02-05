@@ -40,7 +40,7 @@ typedef struct {
     uint8_t sys_flags;
     uint8_t ps2_cardsize;
     uint8_t ps2_variant; // Variant for keys
-    uint8_t ps1_maxcardidx
+    uint8_t ps1_maxcardidx;
     uint8_t ps2_maxcardidx;
 } serialized_settings_t;
 
